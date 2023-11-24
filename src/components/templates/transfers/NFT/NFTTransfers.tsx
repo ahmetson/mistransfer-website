@@ -17,7 +17,7 @@ import { useEffect } from 'react';
 import { getEllipsisTxt } from 'utils/format';
 import { useNetwork } from 'wagmi';
 
-const NFTTransfers = () => {
+const NFTTransfers = ({title = "NFT Transfers"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
   const { data } = useSession();
   const { chain } = useNetwork();
@@ -31,7 +31,7 @@ const NFTTransfers = () => {
   return (
     <>
       <Heading size="lg" marginBottom={6}>
-        NFT Transfers
+        {title}
       </Heading>
       {transfers?.length ? (
         <Box border="2px" borderColor={hoverTrColor} borderRadius="xl" padding="24px 18px">

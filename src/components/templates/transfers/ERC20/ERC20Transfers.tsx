@@ -17,7 +17,7 @@ import { useEffect } from 'react';
 import { getEllipsisTxt } from 'utils/format';
 import { useNetwork } from 'wagmi';
 
-const ERC20Transfers = () => {
+const ERC20Transfers = ({title = "ERC20 Transfers"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
   const { data } = useSession();
   const { chain } = useNetwork();
@@ -31,7 +31,7 @@ const ERC20Transfers = () => {
   return (
     <>
       <Heading size="lg" marginBottom={6}>
-        ERC20 Transfers
+        {title}
       </Heading>
       {transfers?.length ? (
         <Box border="2px" borderColor={hoverTrColor} borderRadius="xl" padding="24px 18px">
