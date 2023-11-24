@@ -1,5 +1,5 @@
 import { Default } from 'components/layouts/Default';
-import { ERC20Transfers } from 'components/templates/transfers/ERC20';
+import { ERC20Transfers } from 'components/templates/lost/ERC20';
 
 const ERC20 = () => {
   return (

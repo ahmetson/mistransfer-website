@@ -1,5 +1,5 @@
 import { Default } from 'components/layouts/Default';
-import { NFTTransfers } from 'components/templates/transfers/NFT';
+import { NFTTransfers } from 'components/templates/lost/NFT';
 
 const NFTTransfersPage = () => {
   return (
