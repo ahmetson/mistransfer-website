@@ -9,13 +9,14 @@ import {
   Tfoot,
   Heading,
   Box,
-  useColorModeValue,
+  useColorModeValue, Button,
 } from '@chakra-ui/react';
 import { useEvmWalletNFTTransfers } from '@moralisweb3/next';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { getEllipsisTxt } from 'utils/format';
 import { useNetwork } from 'wagmi';
+import {isCaringContract} from "utils/contracts";
 
 const NFTTransfers = ({title = "NFT Transfers"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
@@ -26,7 +27,7 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
     chain: chain?.id,
   });
 
-  useEffect(() => console.log('transfers: ', transfers), [transfers]);
+  useEffect(() => console.log('lost nfts: ', transfers), [transfers]);
 
   return (
     <>
@@ -41,37 +42,32 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
                 <Tr>
                   <Th>Token</Th>
                   <Th>Token Id</Th>
-                  <Th>From</Th>
-                  <Th>To</Th>
-                  <Th>Type</Th>
+                  <Th>Smartcontract</Th>
                   <Th>Date</Th>
                   <Th isNumeric>Tx Hash</Th>
+                  <Th>Action</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {transfers?.map((transfer, key) => (
-                  <Tr key={key} _hover={{ bgColor: hoverTrColor }} cursor="pointer">
+                {transfers?.flatMap((transfer, key) => {
+                  if (transfer.contractType !== "ERC721") {
+                    return [];
+                  }
+                  if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
+                    return [];
+                  }
+
+                  return (
+                  <Tr key={key} _hover={{bgColor: hoverTrColor}}>
                     <Td>{getEllipsisTxt(transfer?.tokenAddress.checksum)}</Td>
                     <Td>{transfer?.tokenId}</Td>
-                    <Td>{getEllipsisTxt(transfer?.fromAddress?.checksum)}</Td>
                     <Td>{getEllipsisTxt(transfer?.toAddress.checksum)}</Td>
-                    <Td>{transfer.contractType}</Td>
                     <Td>{new Date(transfer.blockTimestamp).toLocaleDateString()}</Td>
                     <Td isNumeric>{getEllipsisTxt(transfer.transactionHash, 2)}</Td>
-                  </Tr>
-                ))}
+                    <Td cursor="pointer"><Button colorScheme='blue'>Reclaim</Button></Td>
+                  </Tr>);
+                })}
               </Tbody>
-              <Tfoot>
-                <Tr>
-                  <Th>Token</Th>
-                  <Th>Token Id</Th>
-                  <Th>From</Th>
-                  <Th>To</Th>
-                  <Th>Type</Th>
-                  <Th>Date</Th>
-                  <Th isNumeric>Tx Hash</Th>
-                </Tr>
-              </Tfoot>
             </Table>
           </TableContainer>
         </Box>
