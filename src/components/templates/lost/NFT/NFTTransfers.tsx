@@ -6,10 +6,9 @@ import {
   Th,
   Tbody,
   Td,
-  Tfoot,
   Heading,
   Box,
-  useColorModeValue, Button,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { useEvmWalletNFTTransfers } from '@moralisweb3/next';
 import { useSession } from 'next-auth/react';
@@ -21,6 +20,7 @@ import { readContract } from 'wagmi/actions';
 import userInterfaceAbi from "utils/abi/UserInterface.json";
 import {Address} from "viem";
 import {EvmNftTransfer} from "@moralisweb3/common-evm-utils";
+import ReclaimButton from "../../../elements/ReclaimButton/ReclaimButton";
 
 const NFTTransfers = ({title = "NFT Transfers"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
@@ -42,7 +42,7 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
       return;
     }
 
-    let transfers = response.data.flatMap(async (transfer, key): Promise<any> => {
+    let transfers = response.data.flatMap(async (transfer): Promise<any> => {
           if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
             return;
           }
@@ -112,7 +112,17 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
                     <Td>{getEllipsisTxt(transfer?.toAddress.checksum)}</Td>
                     <Td>{new Date(transfer.blockTimestamp).toLocaleDateString()}</Td>
                     <Td isNumeric>{getEllipsisTxt(transfer.transactionHash, 2)}</Td>
-                    <Td cursor="pointer"><Button colorScheme='blue'>Reclaim</Button></Td>
+                    <Td cursor="pointer">
+                      <ReclaimButton
+                          reclaimType="NFT"
+                          txHash={transfer?.transactionHash}
+                          targetContract={transfer?.toAddress.checksum as string}
+                          token={transfer?.tokenAddress.checksum as string}
+                          value={parseInt(transfer?.tokenId)}
+                          chainId={chain?.id as number}
+                          user={data?.user?.address}
+                      />
+                    </Td>
                   </Tr>);
                 })}
               </Tbody>

@@ -8,7 +8,6 @@ import {
   Td,
   Heading,
   Box,
-  Button,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { Address } from 'viem';
@@ -21,6 +20,8 @@ import { useNetwork } from 'wagmi';
 import { readContract } from 'wagmi/actions';
 import userInterfaceAbi from "utils/abi/UserInterface.json";
 import {Erc20Transfer} from "@moralisweb3/common-evm-utils";
+import ReclaimButton from "../../../elements/ReclaimButton/ReclaimButton";
+import {BigNumber} from "@moralisweb3/common-core";
 
 const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
@@ -42,7 +43,7 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
       return;
     }
 
-    let transfers = response.data.flatMap(async (transfer, key): Promise<any> => {
+    let transfers = response.data.flatMap(async (transfer): Promise<any> => {
           if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
             return;
           }
@@ -107,7 +108,17 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
                     <Td>{getEllipsisTxt(transfer?.toAddress.checksum)}</Td>
                     <Td>{new Date(transfer.blockTimestamp).toLocaleDateString()}</Td>
                     <Td isNumeric>{transfer.value.toDecimal(18)}</Td>
-                    <Td cursor="pointer"><Button colorScheme='blue'>Reclaim</Button></Td>
+                    <Td cursor="pointer">
+                      <ReclaimButton
+                          reclaimType="ERC20"
+                          txHash={transfer?.transactionHash}
+                          targetContract={transfer?.toAddress.checksum as string}
+                          token={transfer?.address.checksum as string}
+                          value={(transfer?.value as BigNumber).toDecimal(0)}
+                          chainId={chain?.id as number}
+                          user={data?.user?.address}
+                      />
+                    </Td>
                   </Tr>);
                   }
                 )}
