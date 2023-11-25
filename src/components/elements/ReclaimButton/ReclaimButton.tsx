@@ -4,7 +4,6 @@ import { prepareWriteContract, writeContract, waitForTransaction, watchContractE
 import { Address, getAddress, parseEther } from "viem";
 import { getUserInterfaceAddress } from "../../../utils/contracts";
 import userInterfaceAbi from "utils/abi/UserInterface.json";
-import { BigNumber } from "@moralisweb3/common-core";
 
 interface ReclaimProps {
     reclaimType: "ERC20" | "NFT",
@@ -48,7 +47,7 @@ const ReclaimButton = ({
           const {hash} = await writeContract(request);
           txToWait = hash;
       } catch (error) {
-          console.error('Failed to writeContract', error.toString());
+          console.error('Failed to writeContract', error);
           alert(error);
           setSubmitted(false);
           return;
@@ -61,9 +60,6 @@ const ReclaimButton = ({
       })
 
       setLoadingText("Oracle validation");
-      console.log(data.contractAddress);
-
-      console.log(`Waiting for a transaction...`);
 
       const unwatch = watchContractEvent(
           {
@@ -92,13 +88,16 @@ const ReclaimButton = ({
   }
 
   return (
-    <Button
-        loadingText={loadingText}
-        colorScheme='blue'
-        variant='solid'
-        onClick={(e) => {clickReclaim()}} isLoading={submitted}>
-      Reclaim
-    </Button>
+      <>
+        <Button
+            loadingText={loadingText}
+            colorScheme='blue'
+            variant='solid'
+            onClick={(e) => {clickReclaim()}}
+            isLoading={submitted}>
+                Reclaim
+            </Button>
+      </>
   );
 };
 
