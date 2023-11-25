@@ -27,7 +27,7 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
   const { data } = useSession();
   const { chain } = useNetwork();
   const { fetch } = useEvmWalletNFTTransfers();
-  let userInterfaceAddress: string = "";
+  let userInterfaceAddress: `0x${string}` = "0x0";
   const [transfers, setTransfers] = useState([] as Array<EvmNftTransfer>);
 
   const fetchReclaimable = useCallback(async () => {
@@ -38,32 +38,32 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
       address: data?.user?.address,
       chain: chain?.id,
     });
-    if (response == undefined) {
+    if (!response) {
       return;
     }
 
-    let transfers = response.data.flatMap(async (transfer): Promise<any> => {
+    const fetchedTransfers = response.data.flatMap(async (transfer) => {
           if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
-            return;
+            return undefined;
           }
 
-          const data = await readContract({
+          const recovered = await readContract({
             address: userInterfaceAddress as Address,
             abi: userInterfaceAbi,
             functionName: 'recoveredNfts',
             args: [transfer?.transactionHash.toString(), transfer?.fromAddress?.checksum]
           });
 
-          if (data) {
-            return;
+          if (recovered) {
+            return undefined;
           }
 
           return transfer;
         }
     );
-    let result = await Promise.all(transfers);
-    let cleaned: any[] = [];
-    for (let tx of result) {
+    const result = await Promise.all(fetchedTransfers);
+    const cleaned: EvmNftTransfer[] = [];
+    for (const tx of result) {
       if (tx !== undefined) {
         cleaned.push(tx);
       }

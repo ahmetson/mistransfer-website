@@ -29,7 +29,7 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
   const { chain } = useNetwork();
   const { fetch } = useEvmWalletTokenTransfers();
   const [transfers, setTransfers] = useState([] as Array<Erc20Transfer>);
-  let userInterfaceAddress: string = "";
+  let userInterfaceAddress: `0x${string}` = "0x0";
 
   const fetchReclaimable = useCallback(async () => {
     if (!data || !data.user || !data.user.address) {
@@ -39,32 +39,32 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
       address: data?.user?.address,
       chain: chain?.id,
     });
-    if (response == undefined) {
+    if (!response) {
       return;
     }
 
-    let transfers = response.data.flatMap(async (transfer): Promise<any> => {
+    const fetchedTransfers = response.data.flatMap(async (transfer) => {
           if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
-            return;
+            return undefined;
           }
 
-          const data = await readContract({
+          const recovered = await readContract({
             address: userInterfaceAddress as Address,
             abi: userInterfaceAbi,
             functionName: 'recoveredTokens',
             args: [transfer?.transactionHash.toString(), transfer?.fromAddress.checksum]
           });
 
-          if (data) {
-            return;
+          if (recovered) {
+            return undefined;
           }
 
           return transfer;
         }
     );
-    let result = await Promise.all(transfers);
-    let cleaned: any[] = [];
-    for (let tx of result) {
+    const result = await Promise.all(fetchedTransfers);
+    const cleaned: Erc20Transfer[] = [];
+    for (const tx of result) {
       if (tx !== undefined) {
         cleaned.push(tx);
       }

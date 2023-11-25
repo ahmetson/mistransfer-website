@@ -48,14 +48,13 @@ const ReclaimButton = ({
           txToWait = hash;
       } catch (error) {
           console.error('Failed to writeContract', error);
-          alert(error);
           setSubmitted(false);
           return;
       }
 
       setLoadingText("Confirming");
 
-      const data = await waitForTransaction({
+      await waitForTransaction({
           hash: txToWait,
       })
 
@@ -68,17 +67,17 @@ const ReclaimButton = ({
               eventName: 'Response',
           },
           (logs) => {
-              for (let log of logs) {
+              for (const log of logs) {
                   if (log.address.toLowerCase() !== interfaceAddress.toLowerCase()) {
                       console.log(`Invalid log:`, log);
                       continue;
                   }
-                  let topic0 = log.topics[0] as string;
-                  let topic1 = log.topics[1] as string;
+                  const topic0 = log.topics[0] as string;
+                  const topic1 = log.topics[1] as string;
                   console.log(`Topics`, topic0, topic1);
-                  if (topic0.toLowerCase() == user.toLowerCase() || topic1.toLowerCase() == user.toLowerCase()) {
+                  if (topic0.toLowerCase() === user.toLowerCase() || topic1.toLowerCase() === user.toLowerCase()) {
                       setSubmitted(false);
-                      alert("Reclaimed");
+                      console.log("Reclaimed");
                       unwatch();
                       break;
                   }
@@ -93,7 +92,7 @@ const ReclaimButton = ({
             loadingText={loadingText}
             colorScheme='blue'
             variant='solid'
-            onClick={(e) => {clickReclaim()}}
+            onClick={() => {clickReclaim()}}
             isLoading={submitted}>
                 Reclaim
             </Button>
