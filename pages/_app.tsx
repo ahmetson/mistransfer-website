@@ -1,6 +1,5 @@
 import { ChakraProvider } from '@chakra-ui/react';
-import { createClient, WagmiConfig } from 'wagmi';
-import { configureChains } from '@wagmi/core';
+import { configureChains, WagmiConfig, createConfig } from 'wagmi';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -24,7 +23,8 @@ import { publicProvider } from 'wagmi/providers/public';
 import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 
-const { provider, webSocketProvider } = configureChains(
+const { chains, publicClient, webSocketPublicClient } = configureChains(
+// const { provider, webSocketProvider } = configureChains(
   [
     arbitrum,
     arbitrumGoerli,
@@ -46,11 +46,11 @@ const { provider, webSocketProvider } = configureChains(
   [publicProvider()],
 );
 
-const client = createClient({
-  provider,
-  webSocketProvider,
-  autoConnect: true,
-});
+const wagmiConfig = createConfig({
+    autoConnect: true,
+    publicClient,
+    webSocketPublicClient,
+})
 
 const config = {
   initialColorMode: 'dark',
@@ -62,7 +62,7 @@ const theme = extendTheme({ config });
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <ChakraProvider resetCSS theme={theme}>
-      <WagmiConfig client={client}>
+      <WagmiConfig config={wagmiConfig}>
         <SessionProvider session={pageProps.session} refetchInterval={0}>
           <Component {...pageProps} />
         </SessionProvider>
