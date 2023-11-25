@@ -6,29 +6,76 @@ import {
   Th,
   Tbody,
   Td,
-  Tfoot,
   Heading,
   Box,
   Button,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { Address } from 'viem';
 import { useEvmWalletTokenTransfers } from '@moralisweb3/next';
 import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import { getEllipsisTxt } from 'utils/format';
-import {isCaringContract} from "utils/contracts";
+import {isCaringContract, getUserInterfaceAddress} from "utils/contracts";
 import { useNetwork } from 'wagmi';
+import { readContract } from 'wagmi/actions';
+import userInterfaceAbi from "utils/abi/UserInterface.json";
+import {Erc20Transfer} from "@moralisweb3/common-evm-utils";
 
 const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
   const { data } = useSession();
   const { chain } = useNetwork();
-  const { data: transfers } = useEvmWalletTokenTransfers({
-    address: data?.user?.address,
-    chain: chain?.id,
-  });
+  const { fetch } = useEvmWalletTokenTransfers();
+  const [transfers, setTransfers] = useState([] as Array<Erc20Transfer>);
+  let userInterfaceAddress: string = "";
 
-  useEffect(() => console.log('lost transfers: ', transfers, chain?.id), [transfers]);
+  const fetchReclaimable = useCallback(async () => {
+    if (!data || !data.user || !data.user.address) {
+      return;
+    }
+    const response = await fetch({
+      address: data?.user?.address,
+      chain: chain?.id,
+    });
+    if (response == undefined) {
+      return;
+    }
+
+    let transfers = response.data.flatMap(async (transfer, key): Promise<any> => {
+          if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
+            return;
+          }
+
+          const data = await readContract({
+            address: userInterfaceAddress as Address,
+            abi: userInterfaceAbi,
+            functionName: 'recoveredTokens',
+            args: [transfer?.transactionHash.toString(), transfer?.fromAddress.checksum]
+          });
+
+          if (data) {
+            return;
+          }
+
+          return transfer;
+        }
+    );
+    let result = await Promise.all(transfers);
+    let cleaned: any[] = [];
+    for (let tx of result) {
+      if (tx !== undefined) {
+        cleaned.push(tx);
+      }
+    }
+
+    setTransfers(cleaned);
+  }, [chain, data]);
+
+  useEffect(() => {
+    userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
+    fetchReclaimable();
+  }, [fetchReclaimable]);
 
   return (
     <>
@@ -49,7 +96,7 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {transfers?.flatMap((transfer, key) => {
+                {transfers?.map((transfer, key) => {
                   if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
                     return [];
                   }
@@ -69,7 +116,7 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
           </TableContainer>
         </Box>
       ) : (
-        <Box>Looks Like you do not have any ERC20 Transfers</Box>
+        <Box>Looks Like you do not have any ERC20 token to recover</Box>
       )}
     </>
   );

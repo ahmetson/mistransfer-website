@@ -13,21 +13,69 @@ import {
 } from '@chakra-ui/react';
 import { useEvmWalletNFTTransfers } from '@moralisweb3/next';
 import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { getEllipsisTxt } from 'utils/format';
 import { useNetwork } from 'wagmi';
-import {isCaringContract} from "utils/contracts";
+import {getUserInterfaceAddress, isCaringContract} from "utils/contracts";
+import { readContract } from 'wagmi/actions';
+import userInterfaceAbi from "utils/abi/UserInterface.json";
+import {Address} from "viem";
+import {EvmNftTransfer} from "@moralisweb3/common-evm-utils";
 
 const NFTTransfers = ({title = "NFT Transfers"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
   const { data } = useSession();
   const { chain } = useNetwork();
-  const { data: transfers } = useEvmWalletNFTTransfers({
-    address: data?.user?.address,
-    chain: chain?.id,
-  });
+  const { fetch } = useEvmWalletNFTTransfers();
+  let userInterfaceAddress: string = "";
+  const [transfers, setTransfers] = useState([] as Array<EvmNftTransfer>);
 
-  useEffect(() => console.log('lost nfts: ', transfers), [transfers]);
+  const fetchReclaimable = useCallback(async () => {
+    if (!data || !data.user || !data.user.address) {
+      return;
+    }
+    const response = await fetch({
+      address: data?.user?.address,
+      chain: chain?.id,
+    });
+    if (response == undefined) {
+      return;
+    }
+
+    let transfers = response.data.flatMap(async (transfer, key): Promise<any> => {
+          if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
+            return;
+          }
+
+          const data = await readContract({
+            address: userInterfaceAddress as Address,
+            abi: userInterfaceAbi,
+            functionName: 'recoveredNfts',
+            args: [transfer?.transactionHash.toString(), transfer?.fromAddress?.checksum]
+          });
+
+          if (data) {
+            return;
+          }
+
+          return transfer;
+        }
+    );
+    let result = await Promise.all(transfers);
+    let cleaned: any[] = [];
+    for (let tx of result) {
+      if (tx !== undefined) {
+        cleaned.push(tx);
+      }
+    }
+
+    setTransfers(cleaned);
+  }, [chain, data]);
+
+  useEffect(() => {
+    userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
+    fetchReclaimable();
+  }, [fetchReclaimable]);
 
   return (
     <>
@@ -72,7 +120,7 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
           </TableContainer>
         </Box>
       ) : (
-        <Box>Looks Like you do not have any NFT transfers</Box>
+        <Box>Looks Like you do not have any NFT to recover</Box>
       )}
     </>
   );

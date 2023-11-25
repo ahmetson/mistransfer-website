@@ -1,7 +1,7 @@
 import { Default } from 'components/layouts/Default';
 import { NFTTransfers } from 'components/templates/lost/NFT';
 
-const NFTTransfersPage = () => {
+const NftLostPage = () => {
   return (
     <Default pageName="Lost NFT">
       <NFTTransfers title="Lost NFTs" />
@@ -9,4 +9,4 @@ const NFTTransfersPage = () => {
   );
 };
 
-export default NFTTransfersPage;
+export default NftLostPage;
