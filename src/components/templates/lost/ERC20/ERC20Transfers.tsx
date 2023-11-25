@@ -8,7 +8,7 @@ import {
   Td,
   Heading,
   Box,
-  useColorModeValue,
+  useColorModeValue, Text,
 } from '@chakra-ui/react';
 import { Address } from 'viem';
 import { useEvmWalletTokenTransfers } from '@moralisweb3/next';
@@ -94,6 +94,7 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
                   <Th>Date</Th>
                   <Th isNumeric>Value</Th>
                   <Th>Action</Th>
+                  <Th>Fee</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -118,6 +119,9 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
                           chainId={chain?.id as number}
                           user={data?.user?.address}
                       />
+                    </Td>
+                    <Td>
+                      <Text fontSize='sm' color={"#718096"}>0.01 ETH</Text>
                     </Td>
                   </Tr>);
                   }

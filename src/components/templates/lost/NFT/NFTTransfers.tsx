@@ -8,7 +8,7 @@ import {
   Td,
   Heading,
   Box,
-  useColorModeValue,
+  useColorModeValue, Text,
 } from '@chakra-ui/react';
 import { useEvmWalletNFTTransfers } from '@moralisweb3/next';
 import { useSession } from 'next-auth/react';
@@ -94,6 +94,7 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
                   <Th>Date</Th>
                   <Th isNumeric>Tx Hash</Th>
                   <Th>Action</Th>
+                  <Th>Fee</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -122,6 +123,9 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
                           chainId={chain?.id as number}
                           user={data?.user?.address}
                       />
+                    </Td>
+                    <Td>
+                      <Text fontSize='sm' color={"#718096"}>0.01 ETH</Text>
                     </Td>
                   </Tr>);
                 })}
