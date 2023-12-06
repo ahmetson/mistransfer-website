@@ -1,8 +1,8 @@
 {
-  "name": "user-interface",
+  "name": "mistransfer-website",
   "version": "0.0.1",
   "private": true,
-  "homepage": "https://usercaring-ahmetson.vercel.app/",
+  "homepage": "https://mistransfer-website-ahmetson.vercel.app/",
   "scripts": {
     "format": "prettier . \"**/*.+(js|ts|json)\" --write --ignore-path .gitignore",
     "format:check": "prettier \"**/*.+(js|ts|json)\" --check --ignore-path .gitignore",

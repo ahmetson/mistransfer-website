@@ -5,56 +5,32 @@ const Home = () => {
   return (
     <VStack w={'full'}>
       <Heading size="md" marginBottom={6}>
-        Ethereum Boilerplate
+        Mistransfer
       </Heading>
       <List spacing={3}>
         <ListItem>
           <ListIcon as={CheckCircleIcon} color="green.500" />
-          Moralis authentication
+          Recover the tokens sent to a wrong address.
         </ListItem>
         <ListItem>
           <ListIcon as={CheckCircleIcon} color="green.500" />
-          Display Transactions
+          Everything is open sourced.
         </ListItem>
         <ListItem>
           <ListIcon as={CheckCircleIcon} color="green.500" />
-          Display ERC20 transfers
+          Explorer of Lost tokens.
         </ListItem>
         <ListItem>
           <ListIcon as={CheckCircleIcon} color="green.500" />
-          Display ERC20 balances
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          Display NFT balances
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          Display NFT transfers
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          Multichain Support
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          Using Moralis from client-side
+          Supports NFTs and Tokens.
         </ListItem>
         <ListItem>
           <ListIcon as={SettingsIcon} color="green.500" />
-          Adding explorer links to balances, transactions ...
+          One line of code to integrate
         </ListItem>
         <ListItem>
           <ListIcon as={SettingsIcon} color="green.500" />
-          Better responsive design
-        </ListItem>
-        <ListItem>
-          <ListIcon as={SettingsIcon} color="green.500" />
-          Rainbowkit integration
-        </ListItem>
-        <ListItem>
-          <ListIcon as={SettingsIcon} color="green.500" />
-          ... and more
+          Open source
         </ListItem>
       </List>
     </VStack>
