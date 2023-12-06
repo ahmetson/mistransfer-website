@@ -2,6 +2,8 @@ import { CheckCircleIcon, SettingsIcon } from '@chakra-ui/icons';
 import { Heading, VStack, List, ListIcon, ListItem } from '@chakra-ui/react';
 
 const Home = () => {
+  console.log(`The UserInterface: ${process.env.USER_INTERFACE || "0x78220f1C11D91f9B5F21536125201bD1aE5CC676"}`);
+
   return (
     <VStack w={'full'}>
       <Heading size="md" marginBottom={6}>
