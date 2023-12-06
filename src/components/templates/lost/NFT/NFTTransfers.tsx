@@ -31,6 +31,10 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
   const [transfers, setTransfers] = useState([] as Array<EvmNftTransfer>);
 
   const fetchReclaimable = useCallback(async () => {
+    if (!chain) {
+      return;
+    }
+    userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
     if (!data || !data.user || !data.user.address) {
       return;
     }
@@ -73,9 +77,8 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
   }, [chain, data]);
 
   useEffect(() => {
-    userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
     fetchReclaimable();
-  }, [fetchReclaimable]);
+  }, [fetchReclaimable, chain, data]);
 
   return (
     <>

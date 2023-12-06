@@ -32,6 +32,10 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
   let userInterfaceAddress: `0x${string}` = "0x0";
 
   const fetchReclaimable = useCallback(async () => {
+    if (!chain) {
+      return;
+    }
+    userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
     if (!data || !data.user || !data.user.address) {
       return;
     }
@@ -74,9 +78,8 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
   }, [chain, data]);
 
   useEffect(() => {
-    userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
     fetchReclaimable();
-  }, [fetchReclaimable]);
+  }, [fetchReclaimable, chain, data]);
 
   return (
     <>
