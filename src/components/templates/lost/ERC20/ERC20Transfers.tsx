@@ -15,10 +15,11 @@ import { useEvmWalletTokenTransfers } from '@moralisweb3/next';
 import { useSession } from 'next-auth/react';
 import {useEffect, useState, useCallback} from 'react';
 import { getEllipsisTxt } from 'utils/format';
-import {isCaringContract, getUserInterfaceAddress} from "utils/contracts";
+import { getUserInterfaceAddress } from "utils/contracts";
 import { useNetwork } from 'wagmi';
 import { readContract } from 'wagmi/actions';
 import userInterfaceAbi from "utils/abi/UserInterface.json";
+import userCaringInterface from "utils/abi/UserCaringInterface.json";
 import {Erc20Transfer} from "@moralisweb3/common-evm-utils";
 import ReclaimButton from "../../../elements/ReclaimButton/ReclaimButton";
 import {BigNumber} from "@moralisweb3/common-core";
@@ -33,39 +34,54 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
 
   const fetchReclaimable = useCallback(async () => {
     if (!chain) {
+      console.warn(`No chain so skip`);
       return;
     }
     userInterfaceAddress = getUserInterfaceAddress(chain?.id as number);
     if (!data || !data.user || !data.user.address) {
       return;
     }
+    console.log(`User address: ${userInterfaceAddress}`);
     const response = await fetch({
       address: data?.user?.address,
       chain: chain?.id,
     });
+    console.log(`Response from moralis`, response);
     if (!response) {
       return;
     }
 
     const fetchedTransfers = response.data.flatMap(async (transfer) => {
-          if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
-            return undefined;
-          }
+      let userInterfaceAddr: string;
+      try {
+        userInterfaceAddr = await readContract({
+          address: transfer?.toAddress.checksum as Address,
+          abi: userCaringInterface,
+          functionName: 'userInterface',
+          args: []
+        }) as string;
 
-          const recovered = await readContract({
-            address: userInterfaceAddress as Address,
-            abi: userInterfaceAbi,
-            functionName: 'recoveredTokens',
-            args: [transfer?.transactionHash.toString(), transfer?.fromAddress.checksum]
-          });
-
-          if (recovered) {
-            return undefined;
-          }
-
-          return transfer;
+        if (userInterfaceAddr.toLowerCase() !== userInterfaceAddress.toLowerCase()) {
+          console.warn(`User Interface ${userInterfaceAddress} didn't match in ${transfer.toAddress.checksum}: ${userInterfaceAddr}`);
+          return undefined;
         }
-    );
+      } catch (e: any) {
+        return undefined;
+      }
+
+      const recovered = await readContract({
+         address: userInterfaceAddress as Address,
+         abi: userInterfaceAbi,
+         functionName: 'recoveredTokens',
+         args: [transfer?.transactionHash.toString(), transfer?.fromAddress.checksum]
+      });
+
+      if (recovered) {
+        return undefined;
+      }
+
+      return transfer;
+    });
     const result = await Promise.all(fetchedTransfers);
     const cleaned: Erc20Transfer[] = [];
     for (const tx of result) {
@@ -102,10 +118,6 @@ const ERC20Transfers = ({title = "Lost ERC20 tokens"}) => {
               </Thead>
               <Tbody>
                 {transfers?.map((transfer, key) => {
-                  if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
-                    return [];
-                  }
-
                   return (
                   <Tr key={key} _hover={{bgColor: hoverTrColor}} >
                     <Td>{getEllipsisTxt(transfer?.address.checksum)}</Td>

@@ -15,12 +15,13 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useCallback, useState } from 'react';
 import { getEllipsisTxt } from 'utils/format';
 import { useNetwork } from 'wagmi';
-import {getUserInterfaceAddress, isCaringContract} from "utils/contracts";
+import { getUserInterfaceAddress } from "utils/contracts";
 import { readContract } from 'wagmi/actions';
 import userInterfaceAbi from "utils/abi/UserInterface.json";
 import {Address} from "viem";
 import {EvmNftTransfer} from "@moralisweb3/common-evm-utils";
 import ReclaimButton from "../../../elements/ReclaimButton/ReclaimButton";
+import userCaringInterface from "../../../../utils/abi/UserCaringInterface.json";
 
 const NFTTransfers = ({title = "NFT Transfers"}) => {
   const hoverTrColor = useColorModeValue('gray.100', 'gray.700');
@@ -47,9 +48,26 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
     }
 
     const fetchedTransfers = response.data.flatMap(async (transfer) => {
-          if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
-            return undefined;
-          }
+      if (transfer.contractType !== "ERC721") {
+        return undefined;
+      }
+
+      let userInterfaceAddr: string;
+      try {
+        userInterfaceAddr = await readContract({
+          address: transfer?.toAddress.checksum as Address,
+          abi: userCaringInterface,
+          functionName: 'userInterface',
+          args: []
+        }) as string;
+
+        if (userInterfaceAddr.toLowerCase() !== userInterfaceAddress.toLowerCase()) {
+          console.warn(`User Interface ${userInterfaceAddress} didn't match in ${transfer.toAddress.checksum}: ${userInterfaceAddr}`);
+          return undefined;
+        }
+      } catch (e: any) {
+        return undefined;
+      }
 
           const recovered = await readContract({
             address: userInterfaceAddress as Address,
@@ -102,13 +120,6 @@ const NFTTransfers = ({title = "NFT Transfers"}) => {
               </Thead>
               <Tbody>
                 {transfers?.flatMap((transfer, key) => {
-                  if (transfer.contractType !== "ERC721") {
-                    return [];
-                  }
-                  if (!isCaringContract(chain?.id as number, transfer?.toAddress.checksum)) {
-                    return [];
-                  }
-
                   return (
                   <Tr key={key} _hover={{bgColor: hoverTrColor}}>
                     <Td>{getEllipsisTxt(transfer?.tokenAddress.checksum)}</Td>

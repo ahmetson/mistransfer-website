@@ -15,7 +15,7 @@ is a platform to get back Tokens/NFTs sent to a wrong smartcontract.
 💿 Install all dependencies:
 
 ```sh
-cd ethereum-boilerplate
+cd mistransfer/website
 yarn install
 ```
 
@@ -28,6 +28,7 @@ yarn install
 - `MORALIS_API_KEY`: You can get it [here](https://admin.moralis.io/web3apis).
 - `NEXTAUTH_URL`: Your app address. In the development stage, use http://localhost:3000.
 - `NEXTAUTH_SECRET`: Used for encrypting JWT tokens of users. You can put any value here or generate it on https://generate-secret.now.sh/32.
+- `USER_INTERFACE`: UserInterface smartcontract address.
 
 Example:
 
@@ -35,6 +36,7 @@ Example:
 MORALIS_API_KEY=xxxx
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=7197b3e8dbee5ea6274cab37245eec212
+USER_INTERFACE=0x1C5a4E5345E81db66EF3D739f7702DFb76a758b8
 ```
 
 🚴‍♂️ Run your App:
@@ -45,84 +47,25 @@ yarn start
 
 # 🧭 `Table of contents`
 
-- [`ethereum-boilerplate`](#mistransfer-website)
+- [`Mistransfer unique sides`](#mistransfer-website)
 - [🚀 Quick Start](#-quick-start)
 - [🧭 Table of contents](#-table-of-contents)
 - [🏗 Ethereum Components](#-ethereum-components)
   - [`<Lost/ERC20Transfers />`](#losterc20transfers-)
   - [`<Lost/NFTTransfers />`](#lostnfttransfers-)
-  - [`<NFTBalances />`](#nftbalances-)
-  - [`<ERC20Balances />`](#erc20balances-)
-  - [`<ERC20Transfers />`](#erc20transfers-)
-  - [`<NFTTransfers />`](#nfttransfers-)
-  - [`<Transactions />`](#transactions-)
-- [✨ Contributors](#-contributors)
 
 # 🏗 Ethereum Components
 
-### `<Lost/ERC20Transfers />`
-
-![image](https://user-images.githubusercontent.com/78314301/186813957-69badb89-bf93-44e6-90e7-c35801c24d9a.png)
+## `<Lost/ERC20Transfers />`
 
 location: `src/component/templates/lost/ERC20/ERC20Transfers.tsx`
 
 💰 `<Lost/ERC20Transfers />` : displays the user's ERC20 transfers sent to a wrong contract. It shows the *"Reclaim"* button to get them back.
 
-### `<Lost/NFTTransfers />`
-
-![image](https://user-images.githubusercontent.com/78314301/186814187-916851d7-703d-4e30-9b28-b66b0bea90b1.png)
+## `<Lost/NFTTransfers />`
 
 location: `src/component/templates/lost/NFT/NFTTransfers.tsx`
 
 🎨 `<Lost/NFTTransfers />` : displays the user's NFT transfers sent to a wrong contract. It shows the *Reclaim* button to recover lost NFTs.
 
 
-### `<NFTBalances />`
-
-![image](https://user-images.githubusercontent.com/78314301/186813114-2b2265a5-5177-4ab8-9076-588107d450f1.png)
-
-location: `src/component/templates/balances/NFT/NFTBalances.tsx`
-
-🎨 `<NFTBalances />` : displays the user's balances. Uses Moralis Evm API (does not require an active web3 provider).
-
-### `<ERC20Balances />`
-
-![image](https://user-images.githubusercontent.com/78314301/186813448-a0b63106-bcba-46d2-be80-3a7d962e2302.png)
-
-location: `src/component/templates/balances/ERC20/ERC20Balances.tsx`
-
-💰 `<ERC20Balances />` : displays the user's ERC20 balances. Uses Moralis Evm API (does not require an active web3 provider).
-
-### `<ERC20Transfers />`
-
-![image](https://user-images.githubusercontent.com/78314301/186813957-69badb89-bf93-44e6-90e7-c35801c24d9a.png)
-
-location: `src/component/templates/transfers/ERC20/ERC20Transfers.tsx`
-
-💰 `<ERC20Transfers />` : displays the user's ERC20 transfers. Uses Moralis Evm API (does not require an active web3 provider).
-
-### `<NFTTransfers />`
-
-![image](https://user-images.githubusercontent.com/78314301/186814187-916851d7-703d-4e30-9b28-b66b0bea90b1.png)
-
-location: `src/component/templates/transfers/NFT/NFTTransfers.tsx`
-
-🎨 `<NFTTransfers />` : displays the user's NFT transfers. Uses Moralis Evm API (does not require an active web3 provider).
-
-### `<Transactions />`
-
-![image](https://user-images.githubusercontent.com/78314301/186812987-74d8e534-5171-4a53-83f9-3b470bc97e63.png)
-
-location: `src/component/templates/transactions/Transactions.tsx`
-
-💰 `<Transactions />` : displays the user's transactions. Uses Moralis Evm API (does not require an active web3 provider).
-
-# ✨ Contributors
-
-Feel free to contribute 🧙 to `ethereum-boilerplate` project. But first, **please read the [Contributing Guidelines](CONTRIBUTING.md) before opening an issue or PR** so you understand the branching strategy and local development environment.
-
-<a href="https://github.com/ethereum-boilerplate/ethereum-boilerplate/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ethereum-boilerplate/ethereum-boilerplate" />
-</a>
-
-Made with [contrib.rocks](https://contrib.rocks).
